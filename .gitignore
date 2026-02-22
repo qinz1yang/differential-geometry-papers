@@ -1,0 +1,10 @@
+/*
+
+# whitelist
+!/CaoHamilton2008/
+!/lean-toolchain
+!/README.md
+!/.gitignore
+# end of whitelist
+
+.lake/

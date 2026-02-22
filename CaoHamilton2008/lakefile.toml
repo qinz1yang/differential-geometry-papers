@@ -1,0 +1,18 @@
+name = "differential_geometry_papers"
+version = "0.1.0"
+
+# ├── differential_geometry/         
+# │   ├── lakefile.toml
+# │   └── DifferentialGeometry.lean
+# └── differential_geometry-papers/  
+#     ├── lakefile.toml              
+#     ├── lean-toolchain             
+#     └── CaoHamilton2008/           
+#         ├── Lemma2_1.lean          
+#         └── Theorem1_1.lean
+[[require]]
+name = "differential_geometry"
+path = "../differential_geometry"
+
+[[lean_lib]]
+name = "CaoHamilton2008"

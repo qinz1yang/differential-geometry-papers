@@ -19,7 +19,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: qinz1yang/differential-geometry
-          path: ../differential-geometry
+          path: deps/differential-geometry
+
+      - name: Symlink differential-geometry for lakefile
+        run: |
+          mkdir -p ../differential-geometry
+          ln -s $GITHUB_WORKSPACE/deps/differential-geometry/* ../differential-geometry/ || true
 
       - name: Install elan and Lean 4.28
         run: |

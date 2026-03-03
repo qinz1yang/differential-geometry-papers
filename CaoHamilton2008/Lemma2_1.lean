@@ -1,3 +1,0 @@
-import DifferentialGeometry
-
-set_option autoImplicit false

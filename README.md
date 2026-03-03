@@ -6,7 +6,7 @@ Please navigate to individual folders to see the description and axioms injected
 
 ## Formalized Papers
 
-### 1. [Differential Harnack Estimates for Time-Dependent Heat Equations with Potentials](https://arxiv.org/abs/0807.0568)
+### 1. [Differential Harnack Estimates for Time-Dependent Heat Equations with Potentials](https://arxiv.org/abs/0807.0568) - Xiaodong Cao, Richard S. Hamilton
 
 ## File Structure
 

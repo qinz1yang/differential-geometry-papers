@@ -19,7 +19,6 @@ Currently, the following are injected as axioms.
 - **`RicciFlowEquation1D`**: Heat-type equation under Ricci flow: $\partial_t f = \Delta f - c R f$.
 
 ### Commutators & Properties
-- **`LaplacianGradientCommutator`**: Commutation of Laplacian and gradient: $\Delta(\nabla u) = \nabla(\Delta u) + Rc(\nabla u, \cdot)$.
 - **`NormSquaredNonneg`**: Non-negativity of squared tensor norms and gradient norms: $0 \le |T|^2$, $0 \le |\nabla f|^2$.
 
 ### Principles & Inequalities

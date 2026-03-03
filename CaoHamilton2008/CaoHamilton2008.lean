@@ -40,6 +40,7 @@ class LogSmooth
 
 open DerivationAction
 
+/-- $X(0) = 0$ -/
 lemma action_zero (X : V) : action X (0:R) = 0 := by
   have h := DerivationRules.action_add_right X (0:R) (0:R)
   rw [add_zero] at h
@@ -47,6 +48,7 @@ lemma action_zero (X : V) : action X (0:R) = 0 := by
     _ = action X (0:R) - action X (0:R) := by rw [← h]
     _ = 0 := by abel
 
+/-- $X(-g) = -X(g)$ -/
 lemma action_neg (X : V) (g : R) : action X (- g) = - action X g := by
   have h : action X (g + -g) = action X g + action X (-g) := DerivationRules.action_add_right X g (-g)
   have hz : g + -g = 0 := by abel
@@ -55,6 +57,7 @@ lemma action_neg (X : V) (g : R) : action X (- g) = - action X g := by
     _ = 0 - action X g := by rw [← h]
     _ = - action X g := by abel
 
+/-- $X(f) = -f X(u)$ -/
 lemma action_eq
   (metric : MetricDuality R V)
   (u f inv_f : Time → R)
@@ -76,6 +79,7 @@ lemma action_eq
   have h4 : metric.g (grad metric (u t)) X = action X (u t) := g_grad metric (u t) X
   rw [h4]
 
+/-- $Hess(f) = -f Hess(u) + f du \otimes du$ -/
 lemma hess_eq
   (metric : MetricDuality R V)
   (conn : AffineConnection R V)
@@ -97,6 +101,7 @@ lemma hess_eq
   rw [h6]
   ring
 
+/-- $\Delta f = f|\nabla u|^2 - f\Delta u$ -/
 lemma laplacian_eq
   (metric : MetricDuality R V)
   [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor]
@@ -178,19 +183,6 @@ class GradientSquaredEvolution
   dt_grad_sq : ∀ t, TimeDerivative.partial_t (fun t => metric.g (grad metric (u t)) (grad metric (u t))) t =
     (2:R) * Rc conn (grad metric (u t)) (grad metric (u t)) + (2:R) * metric.g (grad metric (u t)) (grad metric (TimeDerivative.partial_t (fun t => u t) t))
 
-/-! AXIOMIZED FACT: Commutator of Laplacian and Gradient.
-Equation: Δ(∇u) = ∇(Δu) + Rc(∇u, ·) -/
-class LaplacianGradientCommutator
-  (metric : MetricDuality R V)
-  [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor]
-  (conn : AffineConnection R V)
-  (u : Time → R)
-  (Rc_form : SmoothBilinearForm R V) where
-  lap_grad_eq : ∀ t,
-    grad metric (laplacian metric.toNonDegenerateMetric.toMetricTensor conn (u t)) =
-    grad metric (laplacian metric.toNonDegenerateMetric.toMetricTensor conn (u t))
-
-
 class LaplacianEvolution
   (metric : MetricDuality R V)
   [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor]
@@ -200,6 +192,7 @@ class LaplacianEvolution
   dt_laplacian : ∀ t, TimeDerivative.partial_t (fun s => laplacian metric.toNonDegenerateMetric.toMetricTensor conn (u s)) t =
     laplacian metric.toNonDegenerateMetric.toMetricTensor conn (TimeDerivative.partial_t u t) + (2:R) * tensorInnerProduct metric Rc_form (hessianForm conn (u t))
 
+/-- Equation (2.1) (page 4, middle) -/
 theorem eq_2_1
   (metric : MetricDuality R V)
   [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor]
@@ -240,6 +233,7 @@ theorem eq_2_1
     _ = - (metric.g (grad metric (u t)) (grad metric (u t)) - laplacian metric.toNonDegenerateMetric.toMetricTensor conn (u t) - c * R_scalar t) := by rw [h_mul_inv]
     _ = laplacian metric.toNonDegenerateMetric.toMetricTensor conn (u t) - metric.g (grad metric (u t)) (grad metric (u t)) + c * R_scalar t := by ring
 
+/-- $\Delta(f+g) = \Delta f + \Delta g$ -/
 lemma laplacian_add
   (metric : MetricTensor R V)
   [MetricTraceOperator R V metric]
@@ -261,6 +255,7 @@ lemma laplacian_add
   rw [hessian_add]
   exact MetricTraceRules.trace_add (metric := metric) (fun X Y => Hess conn f X Y) (fun X Y => Hess conn g X Y)
 
+/-- $\Delta(f-g) = \Delta f - \Delta g$ -/
 lemma laplacian_sub
   (metric : MetricTensor R V)
   [MetricTraceOperator R V metric]
@@ -322,7 +317,7 @@ class SpatialCalculusRules (metric : MetricDuality R V) (conn : AffineConnection
   grad_const : ∀ c : R, grad metric c = 0
   laplacian_smul : ∀ c f : R, laplacian metric.toNonDegenerateMetric.toMetricTensor conn (c * f) = c * laplacian metric.toNonDegenerateMetric.toMetricTensor conn f
 
-/-- The evolution of the Laplacian of u under Ricci flow, combining the commutator and the substitution of ∂_t u. -/
+/-- $\partial_t(\Delta u)$ evolution -/
 theorem dt_laplacian_evolution
   (metric : MetricDuality R V)
   [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor]
@@ -369,6 +364,7 @@ class ScalarTimeDerivRules (R : Type) [CommRing R] (Time : Type) [TimeDerivative
   dt_smul : ∀ (c : R) (f : Time → R) t, TimeDerivative.partial_t (fun s => c * f s) t = c * TimeDerivative.partial_t f t
   dt_mul : ∀ (f g : Time → R) t, TimeDerivative.partial_t (fun s => f s * g s) t = TimeDerivative.partial_t f t * g t + f t * TimeDerivative.partial_t g t
 
+/-- $H$ definition in Lemma 2.1 (page 4, bottom) -/
 def H_def
   (metric : MetricDuality R V)
   [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor]
@@ -383,6 +379,7 @@ def H_def
   b * u t * time_weight.inv_t t -
   d * n * time_weight.inv_t t
 
+/-- Lemma 2.1 evolution equation (page 4, bottom) -/
 theorem lemma_2_1_evolution
   (metric : MetricDuality R V)
   [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor]
@@ -437,7 +434,7 @@ variable [DerivationAction R V] [LieBracket V] [DerivationRules R V] [TraceOpera
 variable [TimeDerivative Time R] [TimeDerivative Time V] [TimeDerivativeRules Time R V]
 variable [ActionTimeDerivativeRules Time R V] [Invertible (2:R)]
 
-/-- Expand the tensor norm squared of a 3-term sum into scalar components. -/
+/-- $|T + aS + bW|^2$ expansion -/
 lemma expand_norm_sq_add3
   (metric : MetricDuality R V)
   [TraceLinearityRules R V]
@@ -456,6 +453,7 @@ lemma expand_norm_sq_add3
              inner_symm metric S T, inner_symm metric W T, inner_symm metric W S]
   ring
 
+/-- $|A - bB - cC|^2$ expansion -/
 lemma expand_norm_sq_sub3
   (metric : MetricDuality R V)
   [TraceLinearityRules R V]
@@ -481,6 +479,7 @@ lemma expand_norm_sq_sub3
   ring
 
 
+/-- Algebraic identity for Lemma 2.1 -/
 lemma lemma_2_1_algebraic_identity
   (α β a b d n c L inv_alpha inv_two inv_t half : R)
   (h_inv_alpha : inv_alpha * α = 1)
@@ -568,6 +567,7 @@ lemma lemma_2_1_algebraic_identity
 
   exact sub_eq_zero.mp (Eq.trans tr1 tr2)
 
+/-- Lemma 2.1 final form (page 5, middle) -/
 theorem lemma_2_1_final
   (metric : MetricDuality R V)
   [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor]
@@ -594,7 +594,6 @@ theorem lemma_2_1_final
   [lap_evol : LaplacianEvolution metric conn u Rc_form]
   [grad_sq_evol : GradientSquaredEvolution metric conn u R_scalar]
   [R_evol : ScalarCurvatureEvolution metric conn Rc_form R_scalar]
-  [_lap_grad_comm : LaplacianGradientCommutator metric conn u Rc_form]
   (t : Time) :
   TimeDerivative.partial_t (fun s => H_def metric conn α β a b d n u R_scalar s) t =
   -- ΔH
@@ -732,12 +731,6 @@ theorem lemma_2_1_final
   have c_inv_2 : α * inv_alpha = 1 := mul_comm inv_alpha α ▸ h_inv_alpha
   have c_inv_3 : inv_two_alpha_minus_beta * ((2:R) * (α - β)) = 1 := h_inv_two
   have c_inv_4 : ((2:R) * (α - β)) * inv_two_alpha_minus_beta = 1 := mul_comm inv_two_alpha_minus_beta ((2:R) * (α - β)) ▸ h_inv_two
-
-  -- Use simp only [c_inv_1, c_inv_2] to replace locally because of CommRing scattering
-  have c_inv_5 : inv_two_alpha_minus_beta * ((2:R) * α - (2:R) * β) = 1 := by
-    calc inv_two_alpha_minus_beta * ((2:R) * α - (2:R) * β) = inv_two_alpha_minus_beta * ((2:R) * (α - β)) := by ring
-      _ = 1 := h_inv_two
-
   have c_inv_5 : inv_two_alpha_minus_beta * ((2:R) * α - (2:R) * β) = 1 := by
     calc inv_two_alpha_minus_beta * ((2:R) * α - (2:R) * β) = inv_two_alpha_minus_beta * ((2:R) * (α - β)) := by ring
       _ = 1 := h_inv_two
@@ -758,6 +751,7 @@ theorem lemma_2_1_final
     (u t)
     (R_scalar t)
 
+/-- $H$ definition for Theorem 1.1 (page 3, top) -/
 def H_thm1_1
   (metric : MetricDuality R V)
   [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor]
@@ -769,6 +763,7 @@ def H_thm1_1
   (3:R) * R_scalar t -
   (2:R) * n * time_weight.inv_t t
 
+/-- $H$ definition equivalence -/
 lemma H_thm1_1_eq_H_def
   (metric : MetricDuality R V)
   [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor]
@@ -780,6 +775,7 @@ lemma H_thm1_1_eq_H_def
   dsimp [H_thm1_1, H_def]
   ring
 
+/-- Simplification of tensor constants -/
 lemma tensor_term_simplify
   (metric : MetricDuality R V)
   (conn : AffineConnection R V)
@@ -795,6 +791,7 @@ lemma tensor_term_simplify
   rw [h1, h2]
   simp only [one_mul]
 
+/-- Corollary 2.2 evolution equation (page 6, top) -/
 theorem corollary_2_2_evolution
   (metric : MetricDuality R V)
   [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor]
@@ -818,7 +815,6 @@ theorem corollary_2_2_evolution
   [lap_evol : LaplacianEvolution metric conn u Rc_form]
   [grad_sq_evol : GradientSquaredEvolution metric conn u R_scalar]
   [R_evol : ScalarCurvatureEvolution metric conn Rc_form R_scalar]
-  [_lap_grad_comm : LaplacianGradientCommutator metric conn u Rc_form]
   (t : Time) :
   TimeDerivative.partial_t (fun s => H_thm1_1 metric conn n u R_scalar s) t =
   laplacian metric.toNonDegenerateMetric.toMetricTensor conn (H_thm1_1 metric conn n u R_scalar t)
@@ -930,6 +926,7 @@ class ParabolicMaximumPrinciple [time_weight : TimeWeight R Time]
     H_thm1_1 metric conn n u R_scalar t ≤ (0:R)
 
 
+/-- Theorem 1.1 (page 2-3) -/
 theorem theorem_1_1
   (metric : MetricDuality R V)
   [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor]
@@ -956,7 +953,6 @@ theorem theorem_1_1
   [lap_evol : LaplacianEvolution metric conn u Rc_form]
   [grad_sq_evol : GradientSquaredEvolution metric conn u R_scalar]
   [R_evol : ScalarCurvatureEvolution metric conn Rc_form R_scalar]
-  [_lap_grad_comm : LaplacianGradientCommutator metric conn u Rc_form]
   (t : Time) :
   H_thm1_1 metric conn n u R_scalar t ≤ (0:R) := by
   apply max_principle_axiom.max_principle t
@@ -973,7 +969,6 @@ theorem theorem_1_1
   have h_dt_R_sub := sub_eq_zero.mp (sub_eq_zero_of_eq h_R_dt.symm)
 
   -- Isolate the needed terms for the difference
-  -- Since linarith doesn't automatically know that multiplying two non-negative terms yields non-negative
   have h_inv_grad : (0:R) ≤ time_weight.inv_t t * metric.g (grad metric (u t)) (grad metric (u t)) :=
     mul_nonneg h_inv_t h_grad_sq
 

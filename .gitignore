@@ -13,6 +13,7 @@
 # Allow essential files at root
 !/.gitignore
 !/lean-toolchain
+!/.github
 
 # Explicitly re-ignore build directories & macOS clutter
 .lake/

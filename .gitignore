@@ -1,10 +1,21 @@
-/*
+# Ignore everything by default
+*
+# Allow directories to be traversed
+!*/
 
-# whitelist
-!/CaoHamilton2008/
-!/lean-toolchain
-!/README.md
+# Allow specific files in any directory
+!*.lean
+!README.md
+!readme.md
+!lakefile.toml
+!lakefile.lean
+
+# Allow essential files at root
 !/.gitignore
-# end of whitelist
+!/lean-toolchain
 
+# Explicitly re-ignore build directories & macOS clutter
 .lake/
+**/.lake/
+.DS_Store
+**/.DS_Store

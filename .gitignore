@@ -9,6 +9,7 @@
 !readme.md
 !lakefile.toml
 !lakefile.lean
+!*.yml
 
 # Allow essential files at root
 !/.gitignore

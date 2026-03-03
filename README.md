@@ -1,6 +1,6 @@
 # Differential Geometry Papers in Lean 4
 
-This repository utilizes the underlying infrastructure of the [Differential Geometry Library](https://github.com/qinz1yang/differential-geometry) to formalize papers in differential geometry.
+This repository utilizes the [Differential Geometry Library](https://github.com/qinz1yang/differential-geometry) to formalize papers in differential geometry.
 
 Please navigate to individual folders to see the description and axioms injected.
 

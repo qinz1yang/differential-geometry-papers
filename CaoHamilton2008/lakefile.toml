@@ -8,10 +8,10 @@ version = "0.1.0"
 #     ├── lakefile.toml              
 #     ├── lean-toolchain             
 #     └── CaoHamilton2008/           
-#         └── Theorem1_1.lean
+#         └── CaoHamilton2008lean
 [[require]]
 name = "differential_geometry"
-path = "../differential_geometry"
+path = "../../differential-geometry"
 
 [[lean_lib]]
 name = "CaoHamilton2008"

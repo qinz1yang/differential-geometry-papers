@@ -10,7 +10,7 @@ Please navigate to individual folders to see the description and axioms injected
 
 ## File Structure
 
-To compile this project, you need to clone both this repository and the differential-geometry repository in the same directory. 
+To compile this project, you need to clone both this repository and the [differential-geometry](https://github.com/qinz1yang/differential-geometry) repository in the same directory. 
 ```text
 .
 ├── differential-geometry/
@@ -30,6 +30,7 @@ After that, navigate to individual folders for papers and run `lake build`. For 
 ```bash
 git clone https://github.com/qinz1yang/differential-geometry
 git clone https://github.com/qinz1yang/differential-geometry-papers
+
 cd differential-geometry-papers/CaoHamilton2008
 lake build CaoHamilton2008
 ```

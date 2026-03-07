@@ -1,5 +1,5 @@
-name = "CaoHamilton2008"
-version = "0.1.2"
+name = "CaoCerenziaKazaras2014"
+version = "0.1.1"
 
 # ├── differential_geometry/         
 # │   ├── lakefile.toml
@@ -7,11 +7,11 @@ version = "0.1.2"
 # └── differential_geometry-papers/  
 #     ├── lakefile.toml              
 #     ├── lean-toolchain             
-#     └── CaoHamilton2008/           
-#         └── CaoHamilton2008.lean
+#     └── CaoCerenziaKazaras2014/           
+#         └── CaoCerenziaKazaras2014.lean
 [[require]]
 name = "differential_geometry"
 path = "../../differential-geometry"
 
 [[lean_lib]]
-name = "CaoHamilton2008"
+name = "CaoCerenziaKazaras2014"

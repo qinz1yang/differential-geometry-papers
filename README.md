@@ -6,7 +6,9 @@ Please navigate to individual folders to see the description and axioms injected
 
 ## Formalized Papers
 
-### 1. [Differential Harnack Estimates for Time-Dependent Heat Equations with Potentials](https://arxiv.org/abs/0807.0568) - Xiaodong Cao, Richard S. Hamilton
+### - [Harnack Estimate for the Endangered Species Equation](https://arxiv.org/abs/1406.7033v1) - Xiaodong Cao, Mark Cerenzia, Demetre Kazaras
+
+### - [Differential Harnack Estimates for Time-Dependent Heat Equations with Potentials](https://arxiv.org/abs/0807.0568) - Xiaodong Cao, Richard S. Hamilton
 
 ## File Structure
 

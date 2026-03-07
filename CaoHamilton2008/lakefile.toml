@@ -1,5 +1,5 @@
 name = "CaoHamilton2008"
-version = "0.1.1"
+version = "0.1.2"
 
 # ├── differential_geometry/         
 # │   ├── lakefile.toml
@@ -8,7 +8,7 @@ version = "0.1.1"
 #     ├── lakefile.toml              
 #     ├── lean-toolchain             
 #     └── CaoHamilton2008/           
-#         └── CaoHamilton2008lean
+#         └── CaoHamilton2008.lean
 [[require]]
 name = "differential_geometry"
 path = "../../differential-geometry"

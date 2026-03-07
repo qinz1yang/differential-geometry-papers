@@ -5,6 +5,7 @@ import DifferentialGeometry.Geometry.Curvature
 import DifferentialGeometry.Operators.Gradient
 import DifferentialGeometry.Operators.Laplacian
 import DifferentialGeometry.Operators.Hessian
+import DifferentialGeometry.Operators.Time
 import DifferentialGeometry.Operators.Variation
 import DifferentialGeometry.Operators.Bochner
 import DifferentialGeometry.Flows.RicciFlow

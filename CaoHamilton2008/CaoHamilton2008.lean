@@ -11,6 +11,7 @@ import DifferentialGeometry.Flows.RicciFlow
 import DifferentialGeometry.Analysis.TraceRankOne
 import DifferentialGeometry.Analysis.TensorInnerProduct
 import DifferentialGeometry.Operators.CovariantDerivative
+import DifferentialGeometry.Operators.SpatialConstant
 import Mathlib.Algebra.Module.Basic
 import Mathlib.Algebra.Order.Ring.Defs
 import Mathlib.Tactic.Ring
@@ -39,23 +40,6 @@ class LogSmooth
   dt_eq : ∀ t, TimeDerivative.partial_t f t = - (f t) * TimeDerivative.partial_t u t
 
 open DerivationAction
-
-/-- $X(0) = 0$ -/
-lemma action_zero (X : V) : action X (0:R) = 0 := by
-  have h := DerivationRules.action_add_right X (0:R) (0:R)
-  rw [add_zero] at h
-  calc action X (0:R) = action X (0:R) + action X (0:R) - action X (0:R) := by abel
-    _ = action X (0:R) - action X (0:R) := by rw [← h]
-    _ = 0 := by abel
-
-/-- $X(-g) = -X(g)$ -/
-lemma action_neg (X : V) (g : R) : action X (- g) = - action X g := by
-  have h : action X (g + -g) = action X g + action X (-g) := DerivationRules.action_add_right X g (-g)
-  have hz : g + -g = 0 := by abel
-  rw [hz, action_zero X] at h
-  calc action X (-g) = action X g + action X (-g) - action X g := by abel
-    _ = 0 - action X g := by rw [← h]
-    _ = - action X g := by abel
 
 /-- $X(f) = -f X(u)$ -/
 lemma action_eq
@@ -307,18 +291,7 @@ lemma laplacian_sub
   rw [t2]
   ring
 
-/-! AXIOMIZED FACT: Definition of spatial constants within the function ring. -/
-class IsSpatialConstant (metric : MetricDuality R V) (conn : AffineConnection R V) [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor] (c : R) : Prop where
-  grad_zero : grad metric c = 0
-  laplacian_zero : laplacian metric.toNonDegenerateMetric.toMetricTensor conn c = 0
-  grad_smul : ∀ f : R, grad metric (c * f) = c • grad metric f
-  laplacian_smul : ∀ f : R, laplacian metric.toNonDegenerateMetric.toMetricTensor conn (c * f) = c * laplacian metric.toNonDegenerateMetric.toMetricTensor conn f
 
-/-! AXIOMIZED FACT: Basic spatial calculus rules.
-Provides linearity of the differential operators. -/
-class DifferentialOperatorLinearity (metric : MetricDuality R V) (conn : AffineConnection R V) [MetricTraceOperator R V metric.toNonDegenerateMetric.toMetricTensor] where
-  grad_add : ∀ f g : R, grad metric (f + g) = grad metric f + grad metric g
-  grad_sub : ∀ f g : R, grad metric (f - g) = grad metric f - grad metric g
 
 /-- $\partial_t(\Delta u)$ evolution -/
 theorem dt_laplacian_evolution
@@ -330,7 +303,7 @@ theorem dt_laplacian_evolution
   (u f inv_f : Time → R)
   (Rc_form : SmoothBilinearForm R V)
   (c : R) (R_scalar : Time → R)
-  [h_const_c : IsSpatialConstant metric conn c]
+  [h_const_c : IsSpatialConstant R V c]
   [log_smooth : LogSmooth metric u f inv_f]
   [flow : RicciFlowEquation1D metric conn f c R_scalar]
   [lap_evol : LaplacianEvolution metric conn u Rc_form]
@@ -350,7 +323,7 @@ theorem dt_laplacian_evolution
   have h2 : laplacian metric.toNonDegenerateMetric.toMetricTensor conn (laplacian metric.toNonDegenerateMetric.toMetricTensor conn (u t) - metric.g (grad metric (u t)) (grad metric (u t))) =
             laplacian metric.toNonDegenerateMetric.toMetricTensor conn (laplacian metric.toNonDegenerateMetric.toMetricTensor conn (u t)) - laplacian metric.toNonDegenerateMetric.toMetricTensor conn (metric.g (grad metric (u t)) (grad metric (u t))) := laplacian_sub metric.toNonDegenerateMetric.toMetricTensor conn _ _
   rw [h2]
-  have h3 : laplacian metric.toNonDegenerateMetric.toMetricTensor conn (c * R_scalar t) = c * laplacian metric.toNonDegenerateMetric.toMetricTensor conn (R_scalar t) := h_const_c.laplacian_smul (R_scalar t)
+  have h3 : laplacian metric.toNonDegenerateMetric.toMetricTensor conn (c * R_scalar t) = c * laplacian metric.toNonDegenerateMetric.toMetricTensor conn (R_scalar t) := laplacian_smul metric conn c (R_scalar t)
   rw [h3]
 
 /-! AXIOMIZED FACT: Time inversion calculus for abstract rings.
@@ -393,7 +366,7 @@ theorem lemma_2_1_evolution
   [time_weight : TimeWeight R Time]
   [scalar_deriv_rules : ScalarTimeDerivRules R Time]
   (α β a b d n c : R)
-  [h_const_c : IsSpatialConstant metric conn c]
+  [h_const_c : IsSpatialConstant R V c]
   (u f inv_f R_scalar : Time → R)
   (Rc_form : SmoothBilinearForm R V)
   [log_smooth : LogSmooth metric u f inv_f]
@@ -582,16 +555,15 @@ theorem lemma_2_1_final
   [scalar_deriv_rules : ScalarTimeDerivRules R Time]
   [bochner_rules : BochnerTraceRules metric conn]
   [Invertible (2:R)]
-  [diff_lin : DifferentialOperatorLinearity metric conn]
-  (α β a b d n c L : R)
-  [h_const_alpha : IsSpatialConstant metric conn α]
-  [h_const_beta : IsSpatialConstant metric conn β]
-  [h_const_a : IsSpatialConstant metric conn a]
-  [h_const_b : IsSpatialConstant metric conn b]
-  [h_const_d : IsSpatialConstant metric conn d]
-  [h_const_n : IsSpatialConstant metric conn n]
-  [h_const_c : IsSpatialConstant metric conn c]
-  [h_const_inv_t : ∀ t, IsSpatialConstant metric conn (time_weight.inv_t t)]
+    (α β a b d n c L : R)
+  [h_const_alpha : IsSpatialConstant R V α]
+  [h_const_beta : IsSpatialConstant R V β]
+  [h_const_a : IsSpatialConstant R V a]
+  [h_const_b : IsSpatialConstant R V b]
+  [h_const_d : IsSpatialConstant R V d]
+  [h_const_n : IsSpatialConstant R V n]
+  [h_const_c : IsSpatialConstant R V c]
+  [h_const_inv_t : ∀ t, IsSpatialConstant R V (time_weight.inv_t t)]
   (inv_alpha inv_two_alpha_minus_beta : R) -- Rigorous inverses for CommRing
   (h_inv_alpha : inv_alpha * α = 1)
   (h_inv_two : inv_two_alpha_minus_beta * ((2:R) * (α - β)) = 1)
@@ -665,38 +637,38 @@ theorem lemma_2_1_final
     laplacian metric.toNonDegenerateMetric.toMetricTensor conn (β * metric.g (grad metric (u t)) (grad metric (u t))) := laplacian_sub _ _ _ _
   rw [l4]
 
-  rw [h_const_alpha.laplacian_smul (laplacian metric.toNonDegenerateMetric.toMetricTensor conn (u t))]
-  rw [h_const_a.laplacian_smul (R_scalar t)]
-  rw [h_const_beta.laplacian_smul (metric.g (grad metric (u t)) (grad metric (u t)))]
+  rw [laplacian_smul metric conn α (laplacian metric.toNonDegenerateMetric.toMetricTensor conn (u t))]
+  rw [laplacian_smul metric conn a (R_scalar t)]
+  rw [laplacian_smul metric conn β (metric.g (grad metric (u t)) (grad metric (u t)))]
 
   have hz1 : b * u t * time_weight.inv_t t = b * (time_weight.inv_t t * u t) := by ring
   rw [hz1]
-  rw [h_const_b.laplacian_smul (time_weight.inv_t t * u t)]
-  rw [(h_const_inv_t t).laplacian_smul (u t)]
+  rw [laplacian_smul metric conn b (time_weight.inv_t t * u t)]
+  rw [laplacian_smul metric conn (time_weight.inv_t t) (u t)]
 
   have hz2 : d * n * time_weight.inv_t t = d * (n * time_weight.inv_t t) := by ring
   rw [hz2]
-  rw [h_const_d.laplacian_smul (n * time_weight.inv_t t)]
-  rw [h_const_n.laplacian_smul (time_weight.inv_t t)]
-  rw [(h_const_inv_t t).laplacian_zero]
+  rw [laplacian_smul metric conn d (n * time_weight.inv_t t)]
+  rw [laplacian_smul metric conn n (time_weight.inv_t t)]
+  rw [laplacian_zero metric conn (time_weight.inv_t t)]
   simp only [mul_zero, sub_zero]
 
   -- Just use eq_2_1 directly
   rw [eq_2_1 metric conn u f inv_f c R_scalar t]
 
-  simp only [diff_lin.grad_sub, diff_lin.grad_add]
+  simp only [grad_sub metric, grad_add metric]
 
-  rw [h_const_alpha.grad_smul (laplacian metric.toNonDegenerateMetric.toMetricTensor conn (u t))]
-  rw [h_const_beta.grad_smul (metric.g (grad metric (u t)) (grad metric (u t)))]
-  rw [h_const_a.grad_smul (R_scalar t)]
-  rw [h_const_c.grad_smul (R_scalar t)]
+  rw [grad_smul metric α (laplacian metric.toNonDegenerateMetric.toMetricTensor conn (u t))]
+  rw [grad_smul metric β (metric.g (grad metric (u t)) (grad metric (u t)))]
+  rw [grad_smul metric a (R_scalar t)]
+  rw [grad_smul metric c (R_scalar t)]
 
-  rw [h_const_b.grad_smul (time_weight.inv_t t * u t)]
-  rw [(h_const_inv_t t).grad_smul (u t)]
+  rw [grad_smul metric b (time_weight.inv_t t * u t)]
+  rw [grad_smul metric (time_weight.inv_t t) (u t)]
 
-  rw [h_const_d.grad_smul (n * time_weight.inv_t t)]
-  rw [h_const_n.grad_smul (time_weight.inv_t t)]
-  rw [(h_const_inv_t t).grad_zero]
+  rw [grad_smul metric d (n * time_weight.inv_t t)]
+  rw [grad_smul metric n (time_weight.inv_t t)]
+  rw [grad_zero metric (time_weight.inv_t t)]
   simp only [smul_zero, sub_zero]
 
   -- Distribute tensor inner product
@@ -846,15 +818,14 @@ theorem corollary_2_2_evolution
   [scalar_deriv_rules : ScalarTimeDerivRules R Time]
   [bochner_rules : BochnerTraceRules metric conn]
   [Invertible (2:R)]
-  [diff_lin : DifferentialOperatorLinearity metric conn]
-  (n : R)
-  [h_const_n : IsSpatialConstant metric conn n]
-  [h_const_inv_t : ∀ t, IsSpatialConstant metric conn (time_weight.inv_t t)]
-  [h_const_two : IsSpatialConstant metric conn (2:R)]
-  [h_const_one : IsSpatialConstant metric conn (1:R)]
-  [h_const_m3 : IsSpatialConstant metric conn (-3:R)]
-  [h_const_0 : IsSpatialConstant metric conn (0:R)]
-  [h_const_m1 : IsSpatialConstant metric conn (-1:R)]
+    (n : R)
+  [h_const_n : IsSpatialConstant R V n]
+  [h_const_inv_t : ∀ t, IsSpatialConstant R V (time_weight.inv_t t)]
+  [h_const_two : IsSpatialConstant R V (2:R)]
+  [h_const_one : IsSpatialConstant R V (1:R)]
+  [h_const_m3 : IsSpatialConstant R V (-3:R)]
+  [h_const_0 : IsSpatialConstant R V (0:R)]
+  [h_const_m1 : IsSpatialConstant R V (-1:R)]
   (u f inv_f R_scalar : Time → R)
   (Rc_form : SmoothBilinearForm R V)
   (h_trace_Rc : ∀ t, tensorInnerProduct metric Rc_form (metricToForm metric.toMetricTensor) = R_scalar t)
@@ -988,16 +959,15 @@ theorem theorem_1_1
   [scalar_deriv_rules : ScalarTimeDerivRules R Time]
   [bochner_rules : BochnerTraceRules metric conn]
   [Invertible (2:R)]
-  [diff_lin : DifferentialOperatorLinearity metric conn]
-  [norm_nonneg : NormSquaredNonneg metric]
+    [norm_nonneg : NormSquaredNonneg metric]
   (n : R)
-  [h_const_n : IsSpatialConstant metric conn n]
-  [h_const_inv_t : ∀ t, IsSpatialConstant metric conn (time_weight.inv_t t)]
-  [h_const_two : IsSpatialConstant metric conn (2:R)]
-  [h_const_one : IsSpatialConstant metric conn (1:R)]
-  [h_const_m3 : IsSpatialConstant metric conn (-3:R)]
-  [h_const_0 : IsSpatialConstant metric conn (0:R)]
-  [h_const_m1 : IsSpatialConstant metric conn (-1:R)]
+  [h_const_n : IsSpatialConstant R V n]
+  [h_const_inv_t : ∀ t, IsSpatialConstant R V (time_weight.inv_t t)]
+  [h_const_two : IsSpatialConstant R V (2:R)]
+  [h_const_one : IsSpatialConstant R V (1:R)]
+  [h_const_m3 : IsSpatialConstant R V (-3:R)]
+  [h_const_0 : IsSpatialConstant R V (0:R)]
+  [h_const_m1 : IsSpatialConstant R V (-1:R)]
   (u f inv_f R_scalar : Time → R)
   (Rc_form : SmoothBilinearForm R V)
   [trace_harnack_ineq : TraceHarnackInequality metric conn u R_scalar]

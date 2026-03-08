@@ -26,7 +26,7 @@ jobs:
           mkdir -p ../differential-geometry
           ln -s $GITHUB_WORKSPACE/deps/differential-geometry/* ../differential-geometry/ || true
 
-      - name: Install elan and Lean 4.28
+      - name: Install elan and Lean
         run: |
           curl -O --location https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh
           chmod +x elan-init.sh
@@ -35,6 +35,5 @@ jobs:
 
       - name: Build with Lake
         run: |
-          cd CaoHamilton2008
-          lake exe cache get
-          lake build CaoHamilton2008
+          lake exe cache get || true
+          lake build

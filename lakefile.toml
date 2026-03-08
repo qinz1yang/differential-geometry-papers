@@ -1,0 +1,28 @@
+name = "DifferentialGeometryPapers"
+version = "0.1.2"
+defaultTargets = ["CaoCerenziaKazaras2014", "CaoHamilton2008"]
+
+# ==========================================
+# ├── differential_geometry/         
+# │   ├── lakefile.toml
+# │   └── DifferentialGeometry.lean
+# └── differential-geometry-papers/  
+#     ├── lakefile.toml              
+#     ├── lean-toolchain             
+#     ├── CaoCerenziaKazaras2014/
+#     │   └── CaoCerenziaKazaras2014.lean
+#     └── CaoHamilton2008/           
+#         └── CaoHamilton2008.lean
+# ==========================================
+
+[[require]]
+name = "differential_geometry"
+path = "../differential-geometry"
+
+[[lean_lib]]
+name = "CaoCerenziaKazaras2014"
+srcDir = "CaoCerenziaKazaras2014"
+
+[[lean_lib]]
+name = "CaoHamilton2008"
+srcDir = "CaoHamilton2008"

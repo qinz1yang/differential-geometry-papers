@@ -6,33 +6,34 @@ Please navigate to individual folders to see the description and axioms injected
 
 ## Formalized Papers
 
-### - [Harnack Estimate for the Endangered Species Equation](https://arxiv.org/abs/1406.7033v1) - Xiaodong Cao, Mark Cerenzia, Demetre Kazaras
+### - [Harnack Estimate for the Endangered Species Equation](https://github.com/qinz1yang/differential-geometry-papers/tree/main/CaoCerenziaKazaras2014) - Xiaodong Cao, Mark Cerenzia, Demetre Kazaras
 
-### - [Differential Harnack Estimates for Time-Dependent Heat Equations with Potentials](https://arxiv.org/abs/0807.0568) - Xiaodong Cao, Richard S. Hamilton
+### - [Differential Harnack Estimates for Time-Dependent Heat Equations with Potentials](https://github.com/qinz1yang/differential-geometry-papers/tree/main/CaoHamilton2008) - Xiaodong Cao, Richard S. Hamilton
 
 ## File Structure
 
 To compile this project, you need to clone both this repository and the [differential-geometry](https://github.com/qinz1yang/differential-geometry) repository in the same directory. 
 ```text
-.
-├── differential-geometry/
+
+├── differential_geometry/         
 │   ├── lakefile.toml
 │   └── DifferentialGeometry.lean
-└── differential-geometry-papers/
-    ├── README.md
-    ├── .gitignore
-    └── CaoHamilton2008/
-        ├── README.md
-        ├── lakefile.toml
+└── differential-geometry-papers/  
+    ├── lakefile.toml              
+    ├── lean-toolchain             
+    ├── CaoCerenziaKazaras2014/
+    │   └── CaoCerenziaKazaras2014.lean
+    └── CaoHamilton2008/           
         └── CaoHamilton2008.lean
+
 ```
 
-After that, navigate to individual folders for papers and run `lake build`. For example, for CaoHamilton2008, run the following commands:
+After that, navigate to individual folders for papers and run `lake build`.
 
 ```bash
 git clone https://github.com/qinz1yang/differential-geometry
 git clone https://github.com/qinz1yang/differential-geometry-papers
 
-cd differential-geometry-papers/CaoHamilton2008
-lake build CaoHamilton2008
+cd differential-geometry-papers
+lake build
 ```

@@ -8,7 +8,7 @@ import DifferentialGeometry.Operators.Hessian
 import DifferentialGeometry.Operators.Time
 import DifferentialGeometry.Operators.Variation
 import DifferentialGeometry.Operators.Bochner
-import DifferentialGeometry.Flows.RicciFlow
+import DifferentialGeometry.Flows.RicciFlow.Basic
 import DifferentialGeometry.Analysis.TraceRankOne
 import DifferentialGeometry.Analysis.TensorInnerProduct
 import DifferentialGeometry.Operators.CovariantDerivative

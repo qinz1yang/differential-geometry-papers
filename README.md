@@ -28,7 +28,7 @@ To compile this project, you need to clone both this repository and the [differe
 
 ```
 
-After that, navigate to individual folders for papers and run `lake build`.
+After that, navigate to `differential-geometry-papers` and run `lake build`.
 
 ```bash
 git clone https://github.com/qinz1yang/differential-geometry

@@ -218,79 +218,7 @@ theorem eq_2_1
     _ = - (metric.g (grad metric (u t)) (grad metric (u t)) - laplacian metric.toNonDegenerateMetric.toMetricTensor conn (u t) - c * R_scalar t) := by rw [h_mul_inv]
     _ = laplacian metric.toNonDegenerateMetric.toMetricTensor conn (u t) - metric.g (grad metric (u t)) (grad metric (u t)) + c * R_scalar t := by ring
 
-/-- $\Delta(f+g) = \Delta f + \Delta g$ -/
-lemma laplacian_add
-  (metric : MetricTensor R V)
-  [MetricTraceOperator R V metric]
-  [MetricTraceRules R V metric]
-  (conn : AffineConnection R V)
-  (f g : R) :
-  laplacian metric conn (f + g) = laplacian metric conn f + laplacian metric conn g := by
-  dsimp [laplacian]
-  have hessian_add : Hess conn (f + g) = (fun X Y => Hess conn f X Y + Hess conn g X Y) := by
-    funext X Y
-    dsimp [Hess]
-    have h1 : action Y (f + g) = action Y f + action Y g := DerivationRules.action_add_right Y f g
-    rw [h1]
-    have h2 : action X (action Y f + action Y g) = action X (action Y f) + action X (action Y g) := DerivationRules.action_add_right X (action Y f) (action Y g)
-    rw [h2]
-    have h3 : action (conn.nabla X Y) (f + g) = action (conn.nabla X Y) f + action (conn.nabla X Y) g := DerivationRules.action_add_right (conn.nabla X Y) f g
-    rw [h3]
-    ring
-  rw [hessian_add]
-  exact MetricTraceRules.trace_add (metric := metric) (fun X Y => Hess conn f X Y) (fun X Y => Hess conn g X Y)
 
-/-- $\Delta(f-g) = \Delta f - \Delta g$ -/
-lemma laplacian_sub
-  (metric : MetricTensor R V)
-  [MetricTraceOperator R V metric]
-  [MetricTraceRules R V metric]
-  (conn : AffineConnection R V)
-  (f g : R) :
-  laplacian metric conn (f - g) = laplacian metric conn f - laplacian metric conn g := by
-  dsimp [laplacian]
-  have action_sub : ∀ (X : V) (f g : R), action X (f - g) = action X f - action X g := by
-    intro X f g
-    have hz : f - g = f + -g := sub_eq_add_neg f g
-    rw [hz]
-    have h1 : action X (f + -g) = action X f + action X (-g) := DerivationRules.action_add_right X f (-g)
-    rw [h1]
-    have hz2 : g + -g = 0 := by abel
-    have hz3 : action X (g + -g) = action X g + action X (-g) := DerivationRules.action_add_right X g (-g)
-    have hz4 : action X (0:R) = 0 := by
-      have h := DerivationRules.action_add_right X (0:R) (0:R)
-      rw [add_zero] at h
-      calc action X (0:R) = action X (0:R) + action X (0:R) - action X (0:R) := by abel
-        _ = action X (0:R) - action X (0:R) := by rw [← h]
-        _ = 0 := by abel
-    rw [hz2, hz4] at hz3
-    have hneg : action X (-g) = - action X g := by
-      calc action X (-g) = action X g + action X (-g) - action X g := by abel
-        _ = 0 - action X g := by rw [← hz3]
-        _ = - action X g := by abel
-    rw [hneg]
-    abel
-  have hessian_sub : Hess conn (f - g) = (fun X Y => Hess conn f X Y - Hess conn g X Y) := by
-    funext X Y
-    dsimp [Hess]
-    have h1 : action Y (f - g) = action Y f - action Y g := action_sub Y f g
-    rw [h1]
-    have h2 : action X (action Y f - action Y g) = action X (action Y f) - action X (action Y g) := action_sub X (action Y f) (action Y g)
-    rw [h2]
-    have h3 : action (conn.nabla X Y) (f - g) = action (conn.nabla X Y) f - action (conn.nabla X Y) g := action_sub (conn.nabla X Y) f g
-    rw [h3]
-    ring
-  rw [hessian_sub]
-  have h_sub : (fun X Y => Hess conn f X Y - Hess conn g X Y) = ((fun X Y => Hess conn f X Y) + (fun X Y => (-1:R) * Hess conn g X Y)) := by
-    funext X Y
-    calc Hess conn f X Y - Hess conn g X Y = Hess conn f X Y - 1 * Hess conn g X Y := by ring
-      _ = Hess conn f X Y + (-1:R) * Hess conn g X Y := by ring
-  rw [h_sub]
-  have t1 : MetricTraceOperator.metric_trace metric ((fun X Y => Hess conn f X Y) + (fun X Y => (-1:R) * Hess conn g X Y)) = MetricTraceOperator.metric_trace metric (fun X Y => Hess conn f X Y) + MetricTraceOperator.metric_trace metric (fun X Y => (-1:R) * Hess conn g X Y) := MetricTraceRules.trace_add (metric := metric) (fun X Y => Hess conn f X Y) (fun X Y => (-1:R) * Hess conn g X Y)
-  rw [t1]
-  have t2 : MetricTraceOperator.metric_trace metric (fun X Y => (-1:R) * Hess conn g X Y) = (-1:R) * MetricTraceOperator.metric_trace metric (fun X Y => Hess conn g X Y) := MetricTraceRules.trace_smul (metric := metric) (-1:R) (fun X Y => Hess conn g X Y)
-  rw [t2]
-  ring
 
 
 
@@ -334,12 +262,6 @@ class TimeWeight (R : Type) [CommRing R] [PartialOrder R] (Time : Type) [TimeDer
   dt_inv_t : ∀ t, TimeDerivative.partial_t inv_t t = - (inv_t t)^2
   inv_t_nonneg : ∀ t, (0:R) ≤ inv_t t
 
-/-! AXIOMIZED FACT: Single-variable calculus rules for scalar time derivatives. -/
-class ScalarTimeDerivRules (R : Type) [CommRing R] (Time : Type) [TimeDerivative Time R] where
-  dt_add : ∀ (f g : Time → R) t, TimeDerivative.partial_t (fun s => f s + g s) t = TimeDerivative.partial_t f t + TimeDerivative.partial_t g t
-  dt_sub : ∀ (f g : Time → R) t, TimeDerivative.partial_t (fun s => f s - g s) t = TimeDerivative.partial_t f t - TimeDerivative.partial_t g t
-  dt_smul : ∀ (c : R) (f : Time → R) t, TimeDerivative.partial_t (fun s => c * f s) t = c * TimeDerivative.partial_t f t
-  dt_mul : ∀ (f g : Time → R) t, TimeDerivative.partial_t (fun s => f s * g s) t = TimeDerivative.partial_t f t * g t + f t * TimeDerivative.partial_t g t
 
 /-- $H$ definition in Lemma 2.1 (page 4, bottom) -/
 def H_def
@@ -365,7 +287,7 @@ theorem lemma_2_1_evolution
   [TraceLinearityRules R V]
   (conn : AffineConnection R V)
   [time_weight : TimeWeight R Time]
-  [scalar_deriv_rules : ScalarTimeDerivRules R Time]
+  [scalar_deriv_rules : ScalarTimeDerivativeRules R Time]
   (α β a b d n c : R)
   [h_const_c : IsSpatialConstant R V c]
   (u f inv_f R_scalar : Time → R)
@@ -411,49 +333,7 @@ variable [DerivationAction R V] [LieBracket V] [DerivationRules R V] [TraceOpera
 variable [TimeDerivative Time R] [TimeDerivative Time V] [TimeDerivativeRules Time R V]
 variable [ActionTimeDerivativeRules Time R V] [Invertible (2:R)]
 
-/-- $|T + aS + bW|^2$ expansion -/
-lemma expand_norm_sq_add3
-  (metric : MetricDuality R V)
-  [TraceLinearityRules R V]
-  (T S W : SmoothBilinearForm R V)
-  (a b : R) :
-  tensorNormSq metric (T + a • S + b • W) =
-  tensorNormSq metric T +
-  a^2 * tensorNormSq metric S +
-  b^2 * tensorNormSq metric W +
-  (2:R) * a * tensorInnerProduct metric T S +
-  (2:R) * b * tensorInnerProduct metric T W +
-  (2:R) * a * b * tensorInnerProduct metric S W := by
-  dsimp [tensorNormSq]
-  simp only [inner_add_left metric, inner_add_right metric,
-             inner_smul_left metric, inner_smul_right metric,
-             inner_symm metric S T, inner_symm metric W T, inner_symm metric W S]
-  ring
 
-/-- $|A - bB - cC|^2$ expansion -/
-lemma expand_norm_sq_sub3
-  (metric : MetricDuality R V)
-  [TraceLinearityRules R V]
-  (A B C : SmoothBilinearForm R V)
-  (b c : R) :
-  tensorNormSq metric (A - b • B - c • C) =
-  tensorNormSq metric A +
-  b^2 * tensorNormSq metric B +
-  c^2 * tensorNormSq metric C -
-  (2:R) * b * tensorInnerProduct metric A B -
-  (2:R) * c * tensorInnerProduct metric A C +
-  (2:R) * b * c * tensorInnerProduct metric B C := by
-  dsimp [tensorNormSq]
-  have h1 : A - b • B - c • C = A + (-b) • B + (-c) • C := by
-    ext X Y
-    change (A - b • B - c • C) X Y = (A + (-b) • B + (-c) • C) X Y
-    change A X Y - b * B X Y - c * C X Y = A X Y + (-b) * B X Y + (-c) * C X Y
-    ring
-  rw [h1]
-  simp only [inner_add_left metric, inner_add_right metric,
-             inner_smul_left metric, inner_smul_right metric,
-             inner_symm metric B A, inner_symm metric C A, inner_symm metric C B]
-  ring
 
 
 /-- Algebraic identity for Lemma 2.1 -/
@@ -553,7 +433,7 @@ theorem lemma_2_1_final
   [TraceLinearityRules R V]
   (conn : AffineConnection R V) [MetricCompatible conn metric.toNonDegenerateMetric.toMetricTensor] [TorsionFree conn]
   [time_weight : TimeWeight R Time]
-  [scalar_deriv_rules : ScalarTimeDerivRules R Time]
+  [scalar_deriv_rules : ScalarTimeDerivativeRules R Time]
   [bochner_rules : BochnerTraceRules metric conn]
   [Invertible (2:R)]
     (α β a b d n c L : R)
@@ -816,7 +696,7 @@ theorem corollary_2_2_evolution
   [TraceLinearityRules R V]
   (conn : AffineConnection R V) [MetricCompatible conn metric.toNonDegenerateMetric.toMetricTensor] [TorsionFree conn]
   [time_weight : TimeWeight R Time]
-  [scalar_deriv_rules : ScalarTimeDerivRules R Time]
+  [scalar_deriv_rules : ScalarTimeDerivativeRules R Time]
   [bochner_rules : BochnerTraceRules metric conn]
   [Invertible (2:R)]
     (n : R)
@@ -957,7 +837,7 @@ theorem theorem_1_1
   [TraceLinearityRules R V]
   (conn : AffineConnection R V) [MetricCompatible conn metric.toNonDegenerateMetric.toMetricTensor] [TorsionFree conn]
   [time_weight : TimeWeight R Time]
-  [scalar_deriv_rules : ScalarTimeDerivRules R Time]
+  [scalar_deriv_rules : ScalarTimeDerivativeRules R Time]
   [bochner_rules : BochnerTraceRules metric conn]
   [Invertible (2:R)]
     [norm_nonneg : NormSquaredNonneg metric]
